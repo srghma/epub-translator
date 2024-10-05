@@ -226,9 +226,20 @@ class TranslatorEngine():
                 if isinstance(ele, element.NavigableString) and str(ele).strip() not in ['', 'html']:
                     nextpos += 1
                     if nextpos < len(translated_text):
-                        content = self.replace_translation_dict(
-                            translated_text[nextpos])
-                        ele.replace_with(element.NavigableString(content))
+                        original_text = str(ele)
+                        translation = self.replace_translation_dict(translated_text[nextpos])
+
+                        # Create a new span element with the translation
+                        span_tag = soup.new_tag('span', style="color: red")
+                        span_tag.string = translation
+
+                        # Create a new div element to hold the original text and the translation span
+                        div_tag = soup.new_tag('div')
+                        div_tag.append(element.NavigableString(original_text + " "))  # Add original text
+                        div_tag.append(span_tag)  # Add translated text in red
+
+                        # Replace the original NavigableString with the new div
+                        ele.replace_with(div_tag)
 
             with open(html_file, "w", encoding="utf-8") as w:
                 w.write(str(soup))
